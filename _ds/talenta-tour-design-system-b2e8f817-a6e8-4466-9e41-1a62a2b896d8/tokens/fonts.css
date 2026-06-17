@@ -1,0 +1,11 @@
+/* ============================================================
+   Talenta Tour — Fonts
+   Poppins is the brand typeface (used app-wide as `font-poppins`).
+   Loaded from Google Fonts CDN. To self-host, replace the @import
+   with @font-face rules pointing at local .woff2 files.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* JetBrains Mono — used for codes, references, latency figures, kbd */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
