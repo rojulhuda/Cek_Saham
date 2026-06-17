@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analisis Teknikal Saham — Rangkuman Edukasi</title>
+<style>
+/* ── Fonts ────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+/* ── Root vars ─────────────────────────────────────────────── */
+:root {
+  --brand-red: #dc2626;
+  --bg-app: #121212;
+  --surface-card: #181818;
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d8;
+  --text-tertiary: #71717a;
+  --border-subtle: #27272a;
+  --font-sans: 'Poppins', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --success: #10b981;
+  --danger: #dc2626;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body { background: var(--bg-app); color: var(--text-primary); font-family: var(--font-sans); }
+/* FIX: fallback agar konten tetap tampil jika deck-stage gagal load */
+deck-stage:not(:defined) { display: block; }
+/* ── Slide base ──────────────────────────────────────────── */
+.slide {
+  width: 100%; height: 100%; background: var(--bg-app);
+  display: flex; flex-direction: column; padding: 72px 80px;
+  overflow: hidden; position: relative; box-sizing: border-box;
+}
+.slide-eyebrow { font-size: 24px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .22em; color: var(--text-tertiary); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px; }
+.slide-eyebrow b { color: var(--brand-red); }
+.slide-title { font-size: 68px; font-weight: 900; line-height: 1.05;
+  letter-spacing: -.02em; color: #fff; margin: 0 0 32px; }
+.slide-sub { font-size: 28px; font-weight: 400; color: var(--text-secondary); line-height: 1.5; }
+.red-rule { width: 56px; height: 4px; background: var(--brand-red);
+  border-radius: 2px; margin-bottom: 32px; flex-shrink: 0; }
+/* ── Cards ────────────────────────────────────────────────── */
+.s-card { background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: 24px; padding: 36px; box-shadow: 0 8px 30px rgba(0,0,0,.12); }
+.s-card-sm { border-radius: 20px; padding: 24px; }
+.s-eyebrow { font-size: 24px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .22em; color: var(--text-tertiary); margin-bottom: 8px; }
+.s-num { font-family: var(--font-mono); font-weight: 900; color: var(--brand-red); }
+/* ── Lists ───────────────────────────────────────────────── */
+.s-list { list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 14px; }
+.s-list li { display: flex; gap: 14px; font-size: 26px;
+  color: var(--text-secondary); line-height: 1.45; }
+/* ── Badges ──────────────────────────────────────────────── */
+.s-badge { display: inline-flex; align-items: center; padding: 6px 18px;
+  border-radius: 999px; font-size: 24px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; }
+.s-badge-d { background: #fef2f2; color: #b91c1c; }
+.s-badge-w { background: #fffbeb; color: #b45309; }
+.s-badge-s { background: #ecfdf5; color: #047857; }
+.s-badge-n { background: rgba(255,255,255,.05); color: var(--text-secondary); }
+.s-badge-b { background: #fef2f2; color: #dc2626; }
+/* ── Tables ──────────────────────────────────────────────── */
+.s-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+.s-table th { font-size: 24px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--text-tertiary); padding: 4px 22px 10px;
+  text-align: left; }
+.s-table th.col-oasa { color: #f59e0b; }
+.s-table th.col-bumi { color: var(--brand-red); }
+.s-table th.col-dewa { color: #60a5fa; }
+.s-table td { padding: 16px 22px; background: var(--surface-card);
+  border: 1px solid transparent; border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle); font-size: 24px;
+  color: var(--text-primary); line-height: 1.4; }
+.s-table td:first-child { border-left: 1px solid var(--border-subtle);
+  border-radius: 14px 0 0 14px; font-size: 24px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .11em; color: var(--text-tertiary);
+  width: 240px; }
+.s-table td:last-child { border-right: 1px solid var(--border-subtle);
+  border-radius: 0 14px 14px 0; }
+/* ── Layouts ─────────────────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+.left-heavy { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; flex: 1; min-height: 0; }
+/* ── Animations ──────────────────────────────────────────── */
+@media(prefers-reduced-motion: no-preference) {
+  [data-deck-active] .a1 { animation: up .55s var(--ease-smooth) both; }
+  [data-deck-active] .a2 { animation: up .55s var(--ease-smooth) .08s both; }
+  [data-deck-active] .a3 { animation: up .55s var(--ease-smooth) .16s both; }
+  [data-deck-active] .a4 { animation: up .55s var(--ease-smooth) .24s both; }
+  [data-deck-active] .a5 { animation: up .55s var(--ease-smooth) .32s both; }
+  [data-deck-active] .a6 { animation: up .55s var(--ease-smooth) .40s both; }
+  [data-deck-active] .a7 { animation: up .55s var(--ease-smooth) .48s both; }
+}
+@keyframes up { from { opacity: 0; transform: translateY(18px); } }
+/* ── Cover ────────────────────────────────────────────────── */
+.glow { position: absolute; border-radius: 50%; filter: blur(130px);
+  pointer-events: none; z-index: 0; }
+.cover-content { position: relative; z-index: 1; display: flex;
+  flex-direction: column; height: 100%; }
+.cover-title { font-size: 108px; font-weight: 900; line-height: 1;
+  letter-spacing: -.03em; color: #fff; margin: 0 0 32px; }
+.cover-stocks { display: flex; gap: 14px; margin-bottom: 40px; }
+.cover-chip { padding: 8px 22px; border-radius: 999px; font-size: 26px;
+  font-weight: 700; letter-spacing: .06em; border: 1px solid; }
+.cover-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+.cover-meta { font-size: 24px; color: var(--text-tertiary); font-family: var(--font-mono); }
+.cover-disclaimer { display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 24px; border-radius: 999px;
+  background: rgba(220,38,38,.12); border: 1px solid rgba(220,38,38,.25);
+  font-size: 24px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; color: rgba(239,68,68,.8); width: fit-content; }
+/* ── Quote card ──────────────────────────────────────────── */
+.quote-card { background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: 28px; padding: 52px 60px; position: relative; overflow: hidden;
+  isolation: isolate; }
+.quote-text { font-size: 42px; font-weight: 700; line-height: 1.3;
+  color: #fff; letter-spacing: -.01em; }
+/* ── Footer ──────────────────────────────────────────────── */
+.slide-footer { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--border-subtle);
+  font-size: 24px; color: var(--text-tertiary); font-family: var(--font-mono);
+  display: flex; justify-content: space-between; align-items: center; }
+/* ── Floating nav ────────────────────────────────────────── */
+.float-nav {
+  position: fixed; top: 16px; right: 16px; z-index: 9999;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 999px;
+  background: rgba(220,38,38,.18); border: 1px solid rgba(220,38,38,.35);
+  color: #f87171; font-size: 13px; font-weight: 700;
+  text-decoration: none; font-family: var(--font-sans);
+  letter-spacing: .04em; backdrop-filter: blur(10px);
+  transition: background .2s;
+}
+.float-nav:hover { background: rgba(220,38,38,.32); }
+</style>
+</head>
+<body>
+
+<!-- Floating nav to dashboard -->
+<a href="Analisis%20Saham%20-%20Dashboard%20Live.html" class="float-nav" title="Live dashboard dengan TradingView chart">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+  Dashboard Live
+</a>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- SLIDE 01: COVER -->
+  <section data-label="Cover" data-screen-label="01 Cover">
+    <div class="slide" style="padding: 80px;">
+      <div class="glow" style="width: 760px; height: 760px; background: rgba(220,38,38,.16); top: -180px; right: 160px;"></div>
+      <div class="glow" style="width: 480px; height: 480px; background: rgba(220,38,38,.10); bottom: 80px; right: 480px;"></div>
+      <div class="cover-content">
+        <div class="a1" style="font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: .22em; color: var(--text-tertiary); margin-bottom: 48px;">
+          EDUKASI ANALISIS TEKNIKAL · <b style="color: var(--brand-red);">IDX 2026</b>
+        </div>
+        <div class="cover-title a2">Rangkuman<br>Analisis<br><span style="color: var(--brand-red);">Teknikal</span></div>
+        <div class="cover-stocks a3">
+          <span class="cover-chip" style="color: #f59e0b; border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.06);">OASA</span>
+          <span class="cover-chip" style="color: #ef4444; border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.06);">BUMI</span>
+          <span class="cover-chip" style="color: #60a5fa; border-color: rgba(96,165,250,.3); background: rgba(96,165,250,.06);">DEWA</span>
+        </div>
+        <div class="a4" style="font-size: 26px; color: var(--text-secondary); line-height: 1.5; max-width: 700px;">
+          Membaca chart, indikator, dan kerangka penilaian secara mandiri — dari sesi diskusi teknikal.
+        </div>
+        <div class="cover-bottom a5">
+          <div class="cover-meta">Disusun: 15 Juni 2026 · Sumber: TradingView, Investing.com</div>
+          <div class="cover-disclaimer">⚠ Edukasi saja — bukan saran investasi atau rekomendasi beli/jual</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 02: KONTEKS -->
+  <section data-label="Konteks" data-screen-label="02 Konteks">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>01</b> Konteks &amp; Batasan</div>
+      <div class="slide-title a2">Apa yang dibahas?</div>
+      <div class="two-col a3">
+        <div class="s-card" style="display: flex; flex-direction: column; gap: 20px;">
+          <div>
+            <div class="s-eyebrow">Yang dibantu</div>
+            <div style="width: 40px; height: 3px; background: var(--success); border-radius: 2px; margin-top: 6px;"></div>
+          </div>
+          <ul class="s-list">
+            <li><span style="color: var(--brand-red); font-weight: 700;">→</span>Menyajikan data faktual &amp; historis saham</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">→</span>Menjelaskan indikator teknikal</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">→</span>Membaca struktur chart</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">→</span>Kerangka penilaian mandiri</li>
+          </ul>
+          <div style="margin-top: auto;"><span class="s-badge s-badge-s">✓ Edukasi</span></div>
+        </div>
+        <div class="s-card" style="display: flex; flex-direction: column; gap: 20px;">
+          <div>
+            <div class="s-eyebrow">Yang TIDAK diberikan</div>
+            <div style="width: 40px; height: 3px; background: var(--danger); border-radius: 2px; margin-top: 6px;"></div>
+          </div>
+          <ul class="s-list">
+            <li><span style="color: var(--text-tertiary); font-weight: 700;">✕</span>Rekomendasi beli/jual spesifik</li>
+            <li><span style="color: var(--text-tertiary); font-weight: 700;">✕</span>Sinyal trading otomatis</li>
+            <li><span style="color: var(--text-tertiary); font-weight: 700;">✕</span>Jaminan hasil apapun</li>
+          </ul>
+          <div style="margin-top: auto;"><span class="s-badge s-badge-d">✕ Bukan saran investasi</span></div>
+        </div>
+      </div>
+      <div class="slide-footer a4">
+        <span>Semua keputusan &amp; risiko adalah tanggung jawab Anda sendiri.</span>
+        <span>01 / 11</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 03 -->
+  <section data-label="Tiga Saham" data-screen-label="03 Tiga Saham">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>02</b> Tiga Saham</div>
+      <div class="slide-title a2">OASA, BUMI, DEWA</div>
+      <div class="a3" style="flex: 1; display: flex; flex-direction: column; gap: 20px; min-height: 0;">
+        <div class="s-card">
+          <div class="s-eyebrow">OASA — Maharaksa Biru Energi</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Energi/lingkungan. Beta 2.24 (sangat volatil). Likuiditas tipis — gorengan. <strong>Sangat berisiko.</strong>
+          </p>
+        </div>
+        <div class="s-card">
+          <div class="s-eyebrow">BUMI — Bumi Resources</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Penambang batu bara. Likuiditas sangat tinggi. Volatilitas tinggi tapi tradable. Kandidat reversal awal menjanjikan.
+          </p>
+        </div>
+        <div class="s-card">
+          <div class="s-eyebrow">DEWA — Darma Henwa</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Kontraktor jasa tambang. Likuiditas cukup ramai. Pola serupa BUMI dalam ekosistem batu bara.
+          </p>
+        </div>
+      </div>
+      <div class="slide-footer a4"><span>Bersifat ilustratif — verifikasi live di broker Anda.</span><span>02 / 11</span></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 04 -->
+  <section data-label="Indikator" data-screen-label="04 Indikator">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>03</b> Empat Indikator Utama</div>
+      <div class="slide-title a2" style="margin-bottom: 20px;">Cara membaca chart</div>
+      <div style="flex: 1; min-height: 0; overflow-y: auto;">
+        <div class="s-card" style="margin-bottom: 16px;">
+          <div class="s-eyebrow">Moving Average (MA)</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            MA pendek di atas MA panjang = bullish. Dalam tren turun, MA jadi resistance saat harga mendekat dari bawah.
+          </p>
+        </div>
+        <div class="s-card" style="margin-bottom: 16px;">
+          <div class="s-eyebrow">MACD</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Histogram hijau tapi MACD masih di bawah nol = rebound dalam tren turun, <strong>bukan konfirmasi bullish.</strong>
+          </p>
+        </div>
+        <div class="s-card" style="margin-bottom: 16px;">
+          <div class="s-eyebrow">RSI (14)</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Naik dari oversold tapi belum tembus 50 = pemulihan belum kuat. Pantau divergensi.
+          </p>
+        </div>
+        <div class="s-card">
+          <div class="s-eyebrow">Volume</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 10px 0 0;">
+            Naik dengan volume besar = konviksi kuat. Naik dengan tipis = rapuh.
+          </p>
+        </div>
+      </div>
+      <div class="slide-footer a2"><span>Lihat dashboard live untuk chart interaktif.</span><span>03 / 11</span></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 05 -->
+  <section data-label="Reversal" data-screen-label="05 Reversal">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>04</b> Reversal Sejati vs Jebakan</div>
+      <div class="slide-title a2" style="margin-bottom: 20px;">Di awal terlihat identik</div>
+      <div class="a3" style="flex: 1; min-height: 0; overflow-y: auto;">
+        <table class="s-table" style="width: 100%; font-size: 20px;">
+          <thead>
+            <tr>
+              <th style="width: 180px;"></th>
+              <th>Reversal Sejati</th>
+              <th>Bear Market Rally</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Struktur</strong></td><td>Higher high + higher low (≥2 ayunan)</td><td>Hanya 1 ayunan, lalu lower low</td></tr>
+            <tr><td><strong>Volume</strong></td><td>Besar naik, kecil koreksi</td><td>Tipis saat rally</td></tr>
+            <tr><td><strong>Katalis</strong></td><td>Ada (harga komoditas, aksi korporasi)</td><td>Murni spekulatif</td></tr>
+            <tr><td><strong>Level kunci</strong></td><td>Tembus &amp; bertahan di MA50/200</td><td>Ditolak, turun lagi</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="a4" style="margin-top: 16px; padding: 14px 20px; background: rgba(220,38,38,.07); border: 1px solid rgba(220,38,38,.18); border-radius: 14px; font-size: 20px; color: var(--text-tertiary); line-height: 1.5;">
+        <strong>Kunci:</strong> Trader matang tidak menebak — menunggu konfirmasi level kunci ditembus dan bertahan.
+      </div>
+      <div class="slide-footer a5"><span>Verifikasi di platform broker live Anda.</span><span>04 / 11</span></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 06 -->
+  <section data-label="Day vs Swing" data-screen-label="06 Day vs Swing">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>05</b> Day Trading vs Swing</div>
+      <div class="slide-title a2" style="margin-bottom: 20px;">Dua logika berbeda</div>
+      <div class="a3" style="flex: 1; min-height: 0; overflow-y: auto;">
+        <table class="s-table" style="width: 100%;">
+          <thead>
+            <tr><th style="width: 160px;"></th><th>Day Trading</th><th>Swing/Mingguan</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Durasi</td><td>Intraday</td><td>Beberapa hari–minggu</td></tr>
+            <tr><td>Timeframe</td><td>5m, 15m, 30m</td><td>Harian, mingguan</td></tr>
+            <tr><td>Faktor utama</td><td>Order book &amp; likuiditas</td><td>Tren besar, fundamental</td></tr>
+            <tr><td>Risiko gap</td><td><span class="s-badge s-badge-s">Tidak</span></td><td><span class="s-badge s-badge-w">Ya</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="a4" style="margin-top: 16px; padding: 14px 20px; background: rgba(220,38,38,.07); border: 1px solid rgba(220,38,38,.18); border-radius: 14px; font-size: 20px; color: #f87171; line-height: 1.5;">
+        <strong>⚠ Konflik timeframe:</strong> Rebound intraday bisa berakhir saat bertemu resistance di timeframe lebih besar.
+      </div>
+      <div class="slide-footer a5"><span>Selalu verifikasi di timeframe yang Anda trade.</span><span>05 / 11</span></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 07 -->
+  <section data-label="Likuiditas" data-screen-label="07 Likuiditas">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>06</b> Likuiditas &amp; Order Book</div>
+      <div class="slide-title a2" style="margin-bottom: 20px;">Dua hal lebih penting dari indikator</div>
+      <div class="a3" style="flex: 1; min-height: 0; overflow-y: auto;">
+        <div class="s-card" style="margin-bottom: 16px;">
+          <div class="s-eyebrow">Kenapa likuiditas krusial</div>
+          <ul class="s-list" style="margin-top: 10px; font-size: 24px;">
+            <li><span style="color: var(--brand-red); font-weight: 700;">1</span>Saham tipis = beberapa transaksi kecil menggerakkan harga &amp; indikator menyesatkan</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">2</span>Saat ingin exit, bid mungkin tidak cukup — Anda terjebak</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">3</span>Spread lebar = biaya tersembunyi yang menggerus keuntungan</li>
+          </ul>
+        </div>
+        <div class="s-card">
+          <div class="s-eyebrow">Dua penentu terpenting</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;">
+            <div style="background: var(--surface-card); border-radius: 14px; padding: 16px;">
+              <div style="font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px;">Manajemen Risiko</div>
+              <div style="font-size: 20px; color: var(--text-secondary);">Ukuran posisi kecil + stop loss jelas</div>
+            </div>
+            <div style="background: var(--surface-card); border-radius: 14px; padding: 16px;">
+              <div style="font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px;">Order Book Live</div>
+              <div style="font-size: 20px; color: var(--text-secondary);">Pastikan bid cukup untuk keluar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer a4"><span>Selalu cek order book live di broker sebelum entry.</span><span>06 / 11</span></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 08: RINGKASAN -->
+  <section data-label="Ringkasan" data-screen-label="08 Ringkasan">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>Penutup</b> · Analisis Teknikal Saham</div>
+      <div class="two-col a2" style="gap: 32px; margin-top: 8px; flex: 1; min-height: 0;">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="quote-card a3">
+            <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .22em; color: var(--text-tertiary); margin-bottom: 16px;">Prinsip utama</div>
+            <div class="quote-text">"Trader matang TIDAK menebak — menunggu konfirmasi, rela melewatkan awal kenaikan demi kepastian lebih tinggi."</div>
+          </div>
+        </div>
+        <div class="s-card a4" style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="s-eyebrow">Kunci dari sesi ini</div>
+          <ul class="s-list" style="font-size: 24px; gap: 12px;">
+            <li><span style="color: var(--brand-red); font-weight: 900;">01</span> OASA sangat berisiko — setup tersulit</li>
+            <li><span style="color: var(--brand-red); font-weight: 900;">02</span> BUMI &amp; DEWA kandidat reversal menjanjikan</li>
+            <li><span style="color: var(--brand-red); font-weight: 900;">03</span> Konfirmasi level &gt;&gt; indikator apapun</li>
+            <li><span style="color: var(--brand-red); font-weight: 900;">04</span> Likuiditas &amp; manajemen risiko menentukan keselamatan</li>
+            <li><span style="color: var(--brand-red); font-weight: 900;">05</span> Verifikasi data live di broker Anda selalu</li>
+          </ul>
+          <div style="padding: 12px 14px; background: var(--surface-card); border-radius: 12px; font-size: 18px; color: var(--text-tertiary); font-family: var(--font-mono); border: 1px solid var(--border-subtle);">
+            Sumber: TradingView · Investing.com · 15 Jun 2026
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer a5">
+        <span>Dashboard live: klik tombol di kanan atas</span>
+        <span>07 / 11</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 09 -->
+  <section data-label="Bonus 1" data-screen-label="08 Bonus 1">
+    <div class="slide">
+      <div class="slide-eyebrow a1"><b>Bonus</b> Platform &amp; Tools</div>
+      <div class="slide-title a2">Rekomendasi tools untuk analisis</div>
+      <div class="two-col a3" style="font-size: 26px; line-height: 1.6;">
+        <div style="color: var(--text-secondary);">
+          <p style="margin-bottom: 14px;"><strong style="color: #fff;">TradingView</strong> — Chart profesional, semua indikator, screening, alert</p>
+          <p style="margin-bottom: 14px;"><strong style="color: #fff;">Investing.com</strong> — Data ekonomi, sentiment, news real-time</p>
+          <p style="margin-bottom: 14px;"><strong style="color: #fff;">Stockbit</strong> — Community trader Indonesia, analisis lokal</p>
+          <p style="margin-bottom: 14px;"><strong style="color: #fff;">Broker IDX</strong> — Mandiri Sekuritas, Cimb, BCA Sekuritas (order book live)</p>
+        </div>
+        <div class="s-card" style="background: rgba(220,38,38,.08); border-color: rgba(220,38,38,.22);">
+          <div style="font-size: 20px; font-weight: 900; color: #f87171; margin-bottom: 12px;">⚠ Disclaimer</div>
+          <p style="color: var(--text-secondary); line-height: 1.6; margin: 0; font-size: 20px;">
+            Data bisa usang, internet bisa putus, broker bisa offline. Selalu verifikasi sendiri sebelum keputusan apapun. Trading = risiko kehilangan modal.
+          </p>
+        </div>
+      </div>
+      <div class="slide-footer a4"><span>Gunakan tools ini sebagai pelengkap, bukan pengganti riset personal.</span><span>08 / 11</span></div>
+    </div>
+  </section>
+
+  <section data-label="Bonus 2">
+    <div class="slide">
+      <div class="slide-title a1">Terima kasih telah mengikuti</div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+        <div class="a2" style="text-align: center; font-size: 28px; color: var(--text-secondary); line-height: 1.8;">
+          Semoga bermanfaat untuk perjalanan trading Anda.<br><br>
+          <span style="color: var(--text-tertiary); font-size: 20px;">Ingat: Disiplin, manajemen risiko, dan kesabaran menunggu konfirmasi adalah kunci kesuksesan jangka panjang.</span>
+        </div>
+      </div>
+      <div class="slide-footer a3"><span>Dashboard live siap diakses via tombol di pojok kanan atas.</span><span>09 / 11</span></div>
+    </div>
+  </section>
+
+  <section data-label="Bonus 3">
+    <div class="slide">
+      <div class="slide-title a1">Next steps</div>
+      <div class="two-col a2" style="gap: 40px;">
+        <div class="s-card">
+          <div class="s-eyebrow">Praktik Sendiri</div>
+          <ul class="s-list" style="margin-top: 12px;">
+            <li><span style="color: var(--brand-red); font-weight: 700;">1</span>Buka chart saham pilihan Anda di TradingView</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">2</span>Analisis menggunakan 5 kriteria reversal di dashboard</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">3</span>Gunakan kalkulator posisi untuk risk management</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">4</span>Verifikasi order book di broker sebelum entry</li>
+          </ul>
+        </div>
+        <div class="s-card">
+          <div class="s-eyebrow">Lanjutkan Belajar</div>
+          <ul class="s-list" style="margin-top: 12px;">
+            <li><span style="color: var(--brand-red); font-weight: 700;">•</span>Baca buku: <em>A Random Walk Down Wall Street</em>, <em>Market Wizards</em></li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">•</span>Ikuti komunitas: Stockbit, Discord trader</li>
+            <li><span style="color: var(--brand-red); font-weight: 700;">•</span>Paper trade: praktik tanpa modal sebelum live</li>
+          </ul>
+        </div>
+      </div>
+      <div class="slide-footer a3"><span>Kesuksesan trading adalah perjalanan, bukan tujuan akhir.</span><span>10 / 11</span></div>
+    </div>
+  </section>
+
+  <section data-label="End">
+    <div class="slide">
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center;">
+        <div class="a1" style="font-size: 48px; font-weight: 900; margin-bottom: 16px; color: var(--brand-red);">✓</div>
+        <div class="a2" style="font-size: 52px; font-weight: 900; margin-bottom: 24px;">Selesai!</div>
+        <div class="a3" style="font-size: 28px; color: var(--text-secondary); max-width: 800px; line-height: 1.6; margin-bottom: 40px;">Deck edukasi + dashboard live sekarang bisa dibagikan ke dunia.</div>
+        <div class="a4" style="font-size: 20px; color: var(--text-tertiary); font-family: var(--font-mono);">rojulhuda.github.io/cek-saham</div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+
+<!-- FIX: pin ke versi spesifik agar tidak rusak saat unpkg update -->
+<script src="https://unpkg.com/deck-stage@0.3.0/dist/deck-stage.js"></script>
+
+<!-- FIX: fallback jika deck-stage gagal load -->
+<script>
+  window.addEventListener('load', function() {
+    if (!customElements.get('deck-stage')) {
+      console.warn('deck-stage tidak terdefinisi, aktifkan fallback mode');
+      var stage = document.querySelector('deck-stage');
+      if (stage) {
+        stage.style.display = 'block';
+        stage.style.visibility = 'visible';
+      }
+      document.querySelectorAll('section').forEach(function(s) {
+        s.style.display = 'block';
+        s.style.visibility = 'visible';
+        s.style.marginBottom = '40px';
+      });
+    }
+  });
+</script>
+
+<!-- FIX: script keyboard navigation — ditutup dengan benar sebelum script berikutnya -->
+<script>
+  document.addEventListener('keydown', function(e) {
+    var stage = document.querySelector('deck-stage');
+    if (!stage) return;
+    if (e.key === 'ArrowRight') stage.goTo((stage.currentSlide ?? -1) + 1);
+    if (e.key === 'ArrowLeft')  stage.goTo((stage.currentSlide ??  1) - 1);
+  });
+</script>
+
+<!-- FIX: script click handler — tag script terpisah dengan benar -->
+<script>
+  document.addEventListener('click', function(e) {
+    var target = e.target.closest('a, button');
+    if (!target) return;
+    if ((target.textContent || '').includes('Dashboard Live')) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.location.href = 'Analisis%20Saham%20-%20Dashboard%20Live.html?v=' + Date.now();
+    }
+  }, true);
+</script>
+
+</body>
+</html>
