@@ -1,0 +1,102 @@
+/* ============================================================
+   Talenta Tour — Color Tokens
+   Brand red + zinc neutrals, with semantic accents.
+   Base palette (raw) → semantic aliases (intent).
+   ============================================================ */
+
+:root {
+  /* ---- Brand ---- */
+  --brand-red: #dc2626;          /* primary action red (red-600) */
+  --brand-red-strong: #b91c1c;   /* hover / pressed (red-700) */
+  --brand-red-bright: #ef4444;   /* highlight (red-500) */
+  --brand-mark: #850001;         /* logo deep crimson */
+  --brand-mark-alt: #860000;     /* logo wordmark crimson */
+  --brand-charcoal: #202020;     /* logo charcoal */
+  --brand-red-wash: #fef2f2;     /* tinted background (red-50) */
+  --brand-red-wash-strong: #fee2e2; /* red-100 */
+
+  /* ---- Neutrals (zinc) ---- */
+  --zinc-50:  #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+  --white: #ffffff;
+
+  /* Dark-mode surface anchors used across the product */
+  --ink-900: #121212;   /* app background (dark) */
+  --ink-850: #181818;   /* card surface (dark) */
+
+  /* ---- Semantic accents ---- */
+  --success: #10b981;        /* emerald-500 */
+  --success-fg: #047857;     /* emerald-700 */
+  --success-wash: #ecfdf5;   /* emerald-50 */
+  --danger: #ef4444;         /* red-500 */
+  --danger-fg: #b91c1c;      /* red-700 */
+  --danger-wash: #fef2f2;
+  --warning: #f59e0b;        /* amber-500 */
+  --warning-fg: #b45309;     /* amber-700 */
+  --warning-wash: #fffbeb;   /* amber-50 */
+  --info: #3b82f6;           /* blue-500 */
+  --info-fg: #1d4ed8;        /* blue-700 */
+  --info-wash: #eff6ff;      /* blue-50 */
+
+  /* Block-type accents (itinerary builder) */
+  --accent-flight: #0284c7;  /* sky-600 */
+  --accent-flight-wash: #f0f9ff;
+  --accent-hotel: #4f46e5;   /* indigo-600 */
+  --accent-hotel-wash: #eef2ff;
+
+  /* ============================================================
+     Semantic aliases — LIGHT (default)
+     ============================================================ */
+  --bg-app: var(--zinc-50);
+  --bg-elevated: var(--white);
+  --surface-card: var(--white);
+  --surface-sunken: var(--zinc-50);
+  --surface-inset: var(--zinc-100);
+
+  --text-primary: var(--zinc-900);
+  --text-secondary: var(--zinc-500);
+  --text-tertiary: var(--zinc-400);
+  --text-inverse: var(--white);
+  --text-brand: var(--brand-red);
+
+  --border-subtle: var(--zinc-200);
+  --border-strong: var(--zinc-300);
+  --border-brand: var(--brand-red);
+
+  --action-primary: var(--brand-red);
+  --action-primary-hover: var(--brand-red-strong);
+  --action-ink: var(--zinc-900);          /* dark fill buttons */
+  --focus-ring: rgb(220 38 38 / 0.10);    /* red-600 @ 10% */
+}
+
+/* ============================================================
+   Dark theme — applied when [data-theme="dark"] or .dark
+   ============================================================ */
+[data-theme="dark"],
+.dark {
+  --bg-app: var(--ink-900);
+  --bg-elevated: var(--ink-850);
+  --surface-card: var(--ink-850);
+  --surface-sunken: var(--zinc-950);
+  --surface-inset: var(--zinc-900);
+
+  --text-primary: var(--white);
+  --text-secondary: var(--zinc-400);
+  --text-tertiary: var(--zinc-500);
+  --text-inverse: var(--zinc-900);
+  --text-brand: #f87171;          /* red-400 reads better on dark */
+
+  --border-subtle: var(--zinc-800);
+  --border-strong: var(--zinc-700);
+
+  --action-ink: var(--white);
+}

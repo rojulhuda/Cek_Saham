@@ -1,0 +1,42 @@
+/* ============================================================
+   Talenta Tour — Radii & Shadows
+   The brand signature is LARGE, friendly corner radii (pills and
+   24–32px rounding) paired with soft, low-contrast shadows.
+   ============================================================ */
+
+:root {
+  /* ---- Radii ---- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;     /* lg in tailwind terms */
+  --radius-md: 12px;    /* xl — small buttons, kbd */
+  --radius-lg: 16px;    /* 2xl — chips, list rows, blocks */
+  --radius-xl: 24px;    /* 3xl — cards, panels, selects */
+  --radius-2xl: 32px;   /* modals, command palette, hero cards */
+  --radius-pill: 9999px;/* buttons, badges, avatars, toggles */
+
+  /* ---- Shadows (soft, diffuse, low-alpha) ---- */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.06);
+  --shadow-card: 0 8px 30px rgb(0 0 0 / 0.04);   /* the brand's go-to card shadow */
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.10);
+  --shadow-xl: 0 24px 60px rgb(0 0 0 / 0.14);    /* modals, palettes */
+  --shadow-sidebar: 5px 0 20px rgb(0 0 0 / 0.03);
+
+  /* Brand-tinted shadow used on active / dragging elements */
+  --shadow-brand: 0 10px 24px rgb(220 38 38 / 0.20);
+
+  /* Focus ring */
+  --ring-brand: 0 0 0 4px var(--focus-ring);
+
+  /* ---- Motion ---- */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);      /* @kind other */
+  --dur-fast: 150ms;  /* @kind other */
+  --dur-base: 300ms;  /* @kind other */
+  /* signature slow, calm transitions */
+  --dur-slow: 500ms;  /* @kind other */
+
+  /* Press feedback */
+  --press-scale: 0.97; /* @kind other */
+}

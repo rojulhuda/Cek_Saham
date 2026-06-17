@@ -1,0 +1,40 @@
+/* ============================================================
+   Talenta Tour — Spacing Tokens
+   4px base grid. The product uses generous, airy padding inside
+   large rounded cards.
+   ============================================================ */
+
+:root {
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0_5: 2px;
+  --space-1: 4px;
+  --space-1_5: 6px;
+  --space-2: 8px;
+  --space-2_5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Common semantic gaps */
+  --gap-control: var(--space-2);     /* between icon + label */
+  --gap-stack: var(--space-3);       /* between stacked fields */
+  --gap-card: var(--space-6);        /* between cards in a grid */
+  --pad-card: var(--space-5);        /* default card inner padding (20px) */
+  --pad-card-lg: var(--space-8);     /* roomy card / modal padding */
+  --pad-control-x: var(--space-4);   /* button / input horizontal */
+  --pad-control-y: var(--space-3);   /* button / input vertical */
+
+  /* Layout constants pulled from the live product */
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 80px;
+  --header-height: 56px;
+  --content-max: 1200px;
+}

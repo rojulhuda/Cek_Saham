@@ -1,0 +1,41 @@
+/* ============================================================
+   Talenta Tour — Base layer
+   Light resets + element defaults wired to the tokens. Optional
+   for consumers, but it makes raw HTML specimens look on-brand.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+p { margin: 0; }
+
+/* The brand's signature eyebrow label */
+.tt-eyebrow {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--text-tertiary);
+}
+
+code, kbd, samp { font-family: var(--font-mono); }
+
+::selection { background: var(--brand-red-wash-strong); color: var(--brand-mark); }
+
+a { color: var(--text-brand); text-decoration: none; }
+a:hover { color: var(--action-primary-hover); }
+
+:focus-visible { outline: none; box-shadow: var(--ring-brand); border-radius: var(--radius-sm); }
