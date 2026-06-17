@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analisis Saham IDX — Dashboard Live</title>
+
+<!-- TradingView — harus sync sebelum React -->
+<script src="https://s3.tradingview.com/tv.js"></script>
+
+<!-- DS fonts & tokens -->
+<link rel="stylesheet" href="_ds/talenta-tour-design-system-b2e8f817-a6e8-4466-9e41-1a62a2b896d8/styles.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#121212;font-family:var(--font-sans);color:#fff;overflow:hidden}
+#root{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Header ─────────────────────────────────────────── */
+.hdr{
+  flex:none;height:68px;background:#181818;
+  border-bottom:1px solid #27272a;
+  display:flex;align-items:center;gap:14px;padding:0 24px;
+}
+.hdr-logo{font-size:22px;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.hdr-logo span{color:#dc2626}
+.search-wrap{position:relative;flex:0 0 280px}
+.search-wrap input{
+  width:100%;padding:9px 16px 9px 38px;
+  background:#27272a;border:1px solid #3f3f46;border-radius:999px;
+  color:#fff;font-family:var(--font-mono);font-size:14px;font-weight:600;
+  outline:none;transition:border-color .2s;
+}
+.search-wrap input::placeholder{color:#52525b;font-weight:400}
+.search-wrap input:focus{border-color:#dc2626}
+.search-wrap .s-icon{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:14px;color:#52525b;pointer-events:none
+}
+.chips{display:flex;gap:6px;align-items:center;flex:1;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  padding:5px 13px;border-radius:999px;border:1px solid #3f3f46;
+  background:transparent;color:#71717a;font-size:13px;font-weight:700;
+  font-family:var(--font-mono);cursor:pointer;white-space:nowrap;
+  transition:all .18s;flex:none;
+}
+.chip:hover{border-color:#dc2626;color:#fca5a5}
+.chip.on{background:#dc2626;border-color:#dc2626;color:#fff}
+.disc{
+  padding:5px 14px;border-radius:999px;flex:none;
+  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.22);
+  color:#f87171;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;white-space:nowrap
+}
+
+/* ── Main area ─────────────────────────────────────── */
+.main{flex:1;min-height:0;display:flex;gap:0;position:relative;overflow:hidden}
+.chart-col{flex:1;min-width:0;position:relative;background:#121212}
+.tv-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:#121212;z-index:5;flex-direction:column;gap:10px
+}
+.tv-loading .spinner{
+  width:32px;height:32px;border:3px solid #27272a;border-top-color:#dc2626;
+  border-radius:50%;animation:spin .7s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Toggle data panel button ─────────────────────── */
+.toggle-data-btn{
+  position:absolute;right:14px;top:14px;z-index:10;
+  width:42px;height:42px;border-radius:999px;
+  background:#1c1c1c;border:1px solid #27272a;
+  color:#52525b;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-weight:700;
+}
+.toggle-data-btn:hover{
+  background:#dc2626;border-color:#dc2626;color:#fff;transform:scale(1.05)
+}
+.toggle-data-btn.open{
+  background:#dc2626;border-color:#dc2626;color:#fff
+}
+
+/* ── Data panel (overlay) ──────────────────────────── */
+.data-col{
+  position:absolute;right:0;top:0;bottom:0;z-index:20;
+  width:340px;background:#181818;border-left:1px solid #27272a;
+  display:flex;flex-direction:column;overflow-y:auto;padding:20px;gap:14px;
+  scrollbar-width:thin;scrollbar-color:#27272a transparent;
+  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;
+  box-shadow:-4px 0 20px rgba(0,0,0,.3);
+}
+.data-col.hidden{
+  transform:translateX(100%);pointer-events:none;opacity:0
+}
+.data-col.visible{
+  transform:translateX(0);opacity:1;pointer-events:auto
+}
+
+.price-box{display:flex;flex-direction:column;gap:4px;padding-bottom:14px;border-bottom:1px solid #27272a}
+.p-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#52525b}
+.p-main{font-family:var(--font-mono);font-size:32px;font-weight:900;color:#fff;line-height:1}
+.p-change{font-family:var(--font-mono);font-size:16px;font-weight:700;margin-top:2px}
+.pos{color:#10b981}.neg{color:#dc2626}
+.p-time{font-size:11px;color:#3f3f46;font-family:var(--font-mono);margin-top:2px}
+.stat{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e1e1e}
+.stat:last-child{border-bottom:none}
+.stat-k{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.13em;color:#52525b}
+.stat-v{font-family:var(--font-mono);font-weight:700;font-size:14px;color:#e4e4e7}
+.data-note{
+  padding:8px 12px;background:rgba(220,38,38,.07);border-radius:10px;
+  font-size:11px;color:#52525b;line-height:1.55;border:1px solid rgba(220,38,38,.12)
+}
+.skel{background:linear-gradient(90deg,#27272a 25%,#333 50%,#27272a 75%);background-size:200%;animation:sh 1.4s infinite;border-radius:6px}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* ── Bottom panel ───────────────────────────────────── */
+.bot{flex:0 0 252px;background:#181818;border-top:1px solid #27272a;display:flex;flex-direction:column;transition:all .3s ease}
+.bot.hidden{flex:0 0 0;opacity:0;overflow:hidden;border-top:none}
+.bot.visible{flex:0 0 252px;opacity:1}
+.tbar{display:flex;border-bottom:1px solid #27272a;flex:none;align-items:center;justify-content:space-between}
+.tbar-tabs{display:flex}
+.tbtn{
+  padding:12px 22px;font-size:13px;font-weight:700;cursor:pointer;
+  border:none;background:none;color:#52525b;font-family:var(--font-sans);
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.tbtn.on{color:#dc2626;border-bottom-color:#dc2626}
+.toggle-bottom-btn{
+  flex:none;width:36px;height:36px;border-radius:999px;
+  background:transparent;border:1px solid #27272a;color:#52525b;
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-right:12px;
+}
+.toggle-bottom-btn:hover{
+  background:#dc2626;border-color:#dc2626;color:#fff
+}
+.tcontent{flex:1;min-height:0;overflow-y:auto;padding:16px 20px;scrollbar-width:thin;scrollbar-color:#27272a transparent}
+
+/* ── Reversal checker ───────────────────────────────── */
+.rev-wrap{display:grid;grid-template-columns:1fr 240px;gap:18px}
+.crit-list{display:flex;flex-direction:column;gap:7px}
+.crit{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:12px;border:1px solid #27272a;
+  background:#1c1c1c;cursor:pointer;transition:all .18s;
+}
+.crit.on{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.07)}
+.crit-box{
+  width:16px;height:16px;border-radius:4px;border:2px solid #3f3f46;
+  display:flex;align-items:center;justify-content:center;flex:none;
+  transition:all .18s;font-size:10px;color:#fff;font-weight:900;
+}
+.crit.on .crit-box{background:#10b981;border-color:#10b981}
+.crit-txt{font-size:12px;font-weight:600;color:#d4d4d8;flex:1;line-height:1.3}
+.crit-dots{display:flex;gap:2px;flex:none}
+.cdot{width:4px;height:4px;border-radius:50%;background:#3f3f46}
+.crit.on .cdot{background:#10b981}
+.verdict-box{display:flex;flex-direction:column;gap:10px}
+.score-num{font-family:var(--font-mono);font-size:48px;font-weight:900;line-height:1}
+.score-denom{font-size:22px;font-weight:500;color:#3f3f46}
+.bar-t{height:7px;background:#27272a;border-radius:999px;overflow:hidden}
+.bar-f{height:100%;border-radius:999px;transition:width .4s,background .3s}
+.verdict-card{padding:12px 14px;border-radius:12px;border:1px solid}
+.rev-hint{font-size:11px;color:#52525b;line-height:1.5;padding:8px 10px;background:#1c1c1c;border-radius:8px}
+
+/* ── Risk calculator ────────────────────────────────── */
+.calc-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.f-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#52525b;margin-bottom:5px}
+.f-in{
+  width:100%;padding:8px 12px;background:#27272a;border:1px solid #3f3f46;
+  border-radius:11px;color:#fff;font-family:var(--font-mono);font-size:14px;font-weight:600;
+  outline:none;transition:border-color .18s;
+}
+.f-in:focus{border-color:#dc2626}
+.rpct-row{display:flex;gap:5px;margin-top:0}
+.rpct-btn{
+  flex:1;padding:6px 0;border-radius:999px;border:1px solid #3f3f46;
+  background:transparent;color:#71717a;font-family:var(--font-mono);font-weight:700;
+  font-size:13px;cursor:pointer;transition:all .18s;
+}
+.rpct-btn.on{background:#dc2626;border-color:#dc2626;color:#fff}
+.result-num{font-family:var(--font-mono);font-size:36px;font-weight:900;color:#dc2626;line-height:1}
+.result-sub{font-size:12px;color:#52525b;font-family:var(--font-mono);margin-top:2px}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #1e1e1e}
+.r-row:last-child{border-bottom:none}
+.r-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:#52525b}
+.r-v{font-family:var(--font-mono);font-size:13px;font-weight:700;color:#d4d4d8}
+.risk-bar-wrap{margin-top:8px}
+</style>
+<template id="__bundler_thumbnail" data-bg-color="#121212">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#121212"/>
+    <rect x="80" y="80" width="1040" height="640" fill="#181818" rx="32"/>
+    <text x="600" y="200" font-family="Poppins, sans-serif" font-size="72" font-weight="900" fill="#fff" text-anchor="middle">Dashboard Live</text>
+    <text x="600" y="270" font-family="Poppins, sans-serif" font-size="48" font-weight="700" fill="#dc2626" text-anchor="middle">OASA · BUMI · DEWA</text>
+    <g>
+      <rect x="120" y="320" width="320" height="280" fill="#0a0a0a" rx="20"/>
+      <rect x="460" y="320" width="320" height="280" fill="#0a0a0a" rx="20"/>
+      <rect x="800" y="320" width="320" height="280" fill="#0a0a0a" rx="20"/>
+      <text x="280" y="500" font-family="JetBrains Mono, monospace" font-size="32" font-weight="700" fill="#f87171" text-anchor="middle">📈</text>
+      <text x="620" y="500" font-family="JetBrains Mono, monospace" font-size="32" font-weight="700" fill="#f87171" text-anchor="middle">📊</text>
+      <text x="960" y="500" font-family="JetBrains Mono, monospace" font-size="32" font-weight="700" fill="#f87171" text-anchor="middle">⚙️</text>
+    </g>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds/talenta-tour-design-system-b2e8f817-a6e8-4466-9e41-1a62a2b896d8/_ds_bundle.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ── Quick stock list ─────────────────────────────── */
+const STOCKS = [
+  {sym:'BUMI',nm:'Bumi Resources'},
+  {sym:'DEWA',nm:'Darma Henwa'},
+  {sym:'OASA',nm:'Maharaksa'},
+  {sym:'BBCA',nm:'BCA'},
+  {sym:'BBRI',nm:'BRI'},
+  {sym:'BMRI',nm:'Mandiri'},
+  {sym:'TLKM',nm:'Telkom'},
+  {sym:'ASII',nm:'Astra'},
+  {sym:'GOTO',nm:'GoTo'},
+  {sym:'PTBA',nm:'Bukit Asam'},
+  {sym:'ADRO',nm:'Adaro'},
+  {sym:'INDF',nm:'Indofood'},
+  {sym:'UNVR',nm:'Unilever'},
+  {sym:'ANTM',nm:'Aneka Tambang'},
+];
+
+/* ── Format helpers ───────────────────────────────── */
+const fmtRp = n => (n == null || isNaN(n)) ? '—' : 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const fmtVol = n => {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1e12) return (n/1e12).toFixed(2) + ' T lembar';
+  if (n >= 1e9)  return (n/1e9).toFixed(2) + ' M lembar';
+  if (n >= 1e6)  return (n/1e6).toFixed(2) + ' Jt lembar';
+  return n.toLocaleString('id-ID') + ' lembar';
+};
+const fmtMktCap = n => {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1e15) return 'Rp ' + (n/1e15).toFixed(1) + ' Ku';
+  if (n >= 1e12) return 'Rp ' + (n/1e12).toFixed(1) + ' T';
+  if (n >= 1e9)  return 'Rp ' + (n/1e9).toFixed(1) + ' M';
+  return fmtRp(n);
+};
+const fmtPct = n => (n == null || isNaN(n)) ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+
+/* ── Yahoo Finance fetch ──────────────────────────── */
+async function fetchQuote(sym) {
+  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}.JK?interval=1d&range=3mo`;
+  const proxies = [
+    `https://corsproxy.io/?${encodeURIComponent(base)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+  ];
+  for (const p of proxies) {
+    try {
+      const r = await fetch(p, { signal: AbortSignal.timeout(9000) });
+      if (!r.ok) continue;
+      const d = await r.json();
+      const m = d?.chart?.result?.[0]?.meta;
+      if (m && m.regularMarketPrice) return m;
+    } catch(e) { /* next proxy */ }
+  }
+  return null;
+}
+
+/* ── TradingView wrapper ──────────────────────────── */
+let _tvSeq = 0;
+function TVChart({ sym }) {
+  const contRef = useRef(null);
+  const wRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!contRef.current || !window.TradingView) return;
+    setLoading(true);
+    if (wRef.current) { try { wRef.current.remove(); } catch(e) {} wRef.current = null; }
+
+    const seq = ++_tvSeq;
+    const tid = 'tv-c-' + seq;
+    contRef.current.setAttribute('id', tid);
+
+    const t = setTimeout(() => {
+      if (seq !== _tvSeq || !contRef.current) return;
+      wRef.current = new window.TradingView.widget({
+        container_id: tid,
+        symbol: 'IDX:' + sym,
+        interval: 'D',
+        timezone: 'Asia/Jakarta',
+        theme: 'dark',
+        style: '1',
+        locale: 'id',
+        width: '100%',
+        height: '100%',
+        allow_symbol_change: false,
+        save_image: false,
+        hide_top_toolbar: false,
+        studies: ['RSI@tv-studypack', 'MASimple@tv-studypack'],
+        overrides: {
+          'mainSeriesProperties.candleStyle.upColor': '#10b981',
+          'mainSeriesProperties.candleStyle.downColor': '#dc2626',
+          'mainSeriesProperties.candleStyle.borderUpColor': '#10b981',
+          'mainSeriesProperties.candleStyle.borderDownColor': '#dc2626',
+          'mainSeriesProperties.candleStyle.wickUpColor': '#10b981',
+          'mainSeriesProperties.candleStyle.wickDownColor': '#dc2626',
+        },
+        onReady: () => setLoading(false),
+      });
+    }, 80);
+
+    return () => {
+      clearTimeout(t);
+      if (wRef.current) { try { wRef.current.remove(); } catch(e) {} wRef.current = null; }
+    };
+  }, [sym]);
+
+  return (
+    <div style={{ width:'100%', height:'100%', position:'relative' }}>
+      {loading && (
+        <div className="tv-loading">
+          <div className="spinner"></div>
+          <div style={{ fontSize:13, color:'#52525b', fontWeight:700 }}>Memuat chart IDX:{sym}</div>
+          <div style={{ fontSize:11, color:'#3f3f46' }}>TradingView · data live</div>
+        </div>
+      )}
+      <div ref={contRef} style={{ width:'100%', height:'100%' }}></div>
+    </div>
+  );
+}
+
+/* ── Quote data panel ─────────────────────────────── */
+function DataPanel({ sym, quote, loading }) {
+  if (loading) return (
+    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+      <div className="skel" style={{ height:28, width:'55%' }}></div>
+      <div className="skel" style={{ height:16, width:'40%' }}></div>
+      {[1,2,3,4,5,6,7,8].map(i => (
+        <div key={i} className="stat" style={{ gap:8 }}>
+          <div className="skel" style={{ height:12, width:'40%' }}></div>
+          <div className="skel" style={{ height:14, width:'30%' }}></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (!quote) return (
+    <div style={{ display:'flex', flexDirection:'column', gap:12, color:'#52525b' }}>
+      <div style={{ fontSize:14, fontWeight:700, color:'#71717a' }}>Data tidak tersedia</div>
+      <div style={{ fontSize:12, lineHeight:1.6 }}>
+        Network atau proxy sedang tidak bisa diakses. Chart TradingView di kiri tetap menampilkan data live.
+      </div>
+      <div className="data-note">
+        Coba muat ulang halaman atau gunakan VPN/koneksi berbeda.
+      </div>
+    </div>
+  );
+
+  const pct = quote.regularMarketChangePercent;
+  const pos = pct >= 0;
+  const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+  return (
+    <>
+      <div className="price-box">
+        <div className="p-label">{sym}.JK · {quote.currency || 'IDR'}</div>
+        <div className="p-main">{fmtRp(quote.regularMarketPrice)}</div>
+        <div className={'p-change ' + (pos ? 'pos' : 'neg')}>
+          {pos ? '▲' : '▼'} {fmtRp(Math.abs(quote.regularMarketChange ?? 0))} ({fmtPct(pct)})
+        </div>
+        <div className="p-time">Delayed ~15 mnt · per {now} WIB</div>
+      </div>
+
+      <div>
+        {[
+          ['Volume', fmtVol(quote.regularMarketVolume)],
+          ['Open', fmtRp(quote.regularMarketOpen)],
+          ['Prev Close', fmtRp(quote.previousClose)],
+          ['High hari ini', fmtRp(quote.regularMarketDayHigh)],
+          ['Low hari ini', fmtRp(quote.regularMarketDayLow)],
+          ['52W High', fmtRp(quote.fiftyTwoWeekHigh)],
+          ['52W Low', fmtRp(quote.fiftyTwoWeekLow)],
+          ['Market Cap', fmtMktCap(quote.marketCap)],
+        ].map(([k,v]) => (
+          <div key={k} className="stat">
+            <span className="stat-k">{k}</span>
+            <span className="stat-v">{v}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="data-note">
+        ⚠ Yahoo Finance · delay ~15 mnt · bukan real-time tick. Verifikasi di broker sebelum keputusan apapun.
+      </div>
+    </>
+  );
+}
+
+/* ── Reversal Checker ─────────────────────────────── */
+const CRITS = [
+  { id:'lv', lbl:'Tembus & bertahan di level kunci', sub:'MA50/MA200 atau resistance jadi support', w:3 },
+  { id:'hh', lbl:'Higher high + higher low berulang', sub:'Minimal 2 ayunan, bukan sekali pukul', w:2 },
+  { id:'vo', lbl:'Volume besar saat naik', sub:'Vol besar naik, mengecil saat koreksi kecil', w:2 },
+  { id:'ka', lbl:'Ada katalis fundamental', sub:'Harga komoditas berbalik, aksi korporasi', w:1 },
+  { id:'wa', lbl:'Membangun dasar bertahap', sub:'Bukan lonjakan vertikal lalu langsung jatuh', w:1 },
+];
+const MAX_W = CRITS.reduce((s,c) => s+c.w, 0);
+
+function ReversalChecker() {
+  const [on, setOn] = useState({});
+  const score = CRITS.reduce((s,c) => s+(on[c.id]?c.w:0), 0);
+  const pct = score/MAX_W*100;
+  const [col,lbl] = pct>=70 ? ['#10b981','Kandidat Reversal'] : pct>=40 ? ['#f59e0b','Tidak Pasti — Butuh Lebih Banyak Konfirmasi'] : ['#dc2626','Bear Market Rally / Jebakan'];
+
+  return (
+    <div className="rev-wrap">
+      <div className="crit-list">
+        {CRITS.map(c => (
+          <div key={c.id} className={'crit'+(on[c.id]?' on':'')} onClick={() => setOn(p=>({...p,[c.id]:!p[c.id]}))}>
+            <span className="crit-box">{on[c.id]?'✓':''}</span>
+            <span className="crit-txt">
+              <span style={{ display:'block' }}>{c.lbl}</span>
+              <span style={{ fontSize:10, color:'#52525b', fontWeight:500 }}>{c.sub}</span>
+            </span>
+            <span className="crit-dots">
+              {Array.from({length:c.w}).map((_,i) => <span key={i} className="cdot"></span>)}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="verdict-box">
+        <div>
+          <div style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'.16em', color:'#52525b', marginBottom:4 }}>Skor konviksi</div>
+          <div className="score-num" style={{ color:col }}>{score}<span className="score-denom">/{MAX_W}</span></div>
+          <div className="bar-t" style={{ marginTop:8 }}>
+            <div className="bar-f" style={{ width:pct+'%', background:col }}></div>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', marginTop:3, fontSize:9, color:'#3f3f46', fontFamily:'var(--font-mono)' }}>
+            <span>0</span><span style={{ color:'#f59e0b' }}>40%</span><span style={{ color:'#10b981' }}>70%</span><span>100%</span>
+          </div>
+        </div>
+
+        <div className="verdict-card" style={{ borderColor:col+'30', background:col+'0e' }}>
+          <div style={{ fontSize:9, fontWeight:700, textTransform:'uppercase', letterSpacing:'.15em', color:col, marginBottom:5 }}>Kesimpulan</div>
+          <div style={{ fontSize:13, fontWeight:800, color:col, lineHeight:1.35 }}>{lbl}</div>
+        </div>
+
+        <div className="rev-hint">
+          Trader matang tidak menebak — menunggu konfirmasi meski kehilangan sebagian awal kenaikan.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Risk Calculator ──────────────────────────────── */
+function RiskCalc({ liveEntry }) {
+  const [modal, setModal] = useState('10000000');
+  const [rp, setRp] = useState('2');
+  const [entry, setEntry] = useState('');
+  const [stop, setStop] = useState('');
+
+  // auto-fill entry from live price when stock changes
+  useEffect(() => {
+    if (liveEntry && !entry) setEntry(String(Math.round(liveEntry)));
+  }, [liveEntry]);
+
+  const M = parseFloat((modal||'0').replace(/\D/g,''))||0;
+  const R = parseFloat(rp)||0;
+  const E = parseFloat(entry)||0;
+  const S = parseFloat(stop)||0;
+  const riskRp = M*R/100;
+  const gap = E-S;
+  const lots = gap>0 ? Math.floor(riskRp/(gap*100)) : 0;
+  const shares = lots*100;
+  const maxLoss = shares*gap;
+  const barPct = M>0 ? Math.min(100,(maxLoss/M)*100) : 0;
+  const barCol = barPct>5?'#dc2626':barPct>2?'#f59e0b':'#10b981';
+  const fv = n => isNaN(n)||!isFinite(n)||n<=0 ? '—' : 'Rp '+Math.round(n).toLocaleString('id-ID');
+
+  return (
+    <div className="calc-wrap">
+      {/* Inputs */}
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+        <div>
+          <div className="f-lbl">Modal total (Rp)</div>
+          <input className="f-in" value={modal} onChange={e=>setModal(e.target.value)}
+            onFocus={e=>e.target.style.borderColor='#dc2626'}
+            onBlur={e=>e.target.style.borderColor='#3f3f46'}
+            placeholder="10.000.000" />
+        </div>
+        <div>
+          <div className="f-lbl">Risiko max per posisi</div>
+          <div className="rpct-row">
+            {['1','2','3','5'].map(v=>(
+              <button key={v} className={'rpct-btn'+(rp===v?' on':'')} onClick={()=>setRp(v)}>{v}%</button>
+            ))}
+          </div>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+          <div>
+            <div className="f-lbl">Entry (Rp) {liveEntry?<span style={{color:'#10b981',fontSize:9}}>← live</span>:null}</div>
+            <input className="f-in" value={entry} onChange={e=>setEntry(e.target.value)}
+              onFocus={e=>e.target.style.borderColor='#dc2626'}
+              onBlur={e=>e.target.style.borderColor='#3f3f46'}
+              placeholder={liveEntry?String(Math.round(liveEntry)):'mis. 188'} />
+          </div>
+          <div>
+            <div className="f-lbl">Stop Loss (Rp)</div>
+            <input className="f-in" value={stop} onChange={e=>setStop(e.target.value)}
+              onFocus={e=>e.target.style.borderColor='#dc2626'}
+              onBlur={e=>e.target.style.borderColor='#3f3f46'}
+              placeholder="mis. 178" />
+          </div>
+        </div>
+        {gap>0&&E>0&&(
+          <div style={{ fontSize:11, color:'#52525b', fontFamily:'var(--font-mono)' }}>
+            Gap stop: Rp{gap} ({(gap/E*100).toFixed(1)}% dari entry)
+          </div>
+        )}
+      </div>
+
+      {/* Results */}
+      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        <div>
+          <div className="f-lbl">Ukuran posisi</div>
+          <div className="result-num">{lots>0?lots.toFixed(0)+' lot':'—'}</div>
+          <div className="result-sub">{shares>0?shares.toLocaleString('id-ID')+' lembar':''}</div>
+        </div>
+        {[
+          ['Risiko (Rp)', fv(riskRp)],
+          ['Modal terpakai', fv(shares*E)],
+          ['Max kerugian', fv(maxLoss)],
+        ].map(([k,v])=>(
+          <div key={k} className="r-row">
+            <span className="r-k">{k}</span>
+            <span className="r-v">{v}</span>
+          </div>
+        ))}
+        <div className="risk-bar-wrap">
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+            <span className="r-k">Risiko vs modal</span>
+            <span style={{ fontFamily:'var(--font-mono)', fontSize:13, fontWeight:700, color:barCol }}>{barPct.toFixed(1)}%</span>
+          </div>
+          <div className="bar-t">
+            <div className="bar-f" style={{ width:barPct+'%', background:barCol }}></div>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', marginTop:3, fontSize:9, color:'#3f3f46', fontFamily:'var(--font-mono)' }}>
+            <span>0%</span><span style={{color:'#f59e0b'}}>2% aman</span><span style={{color:'#dc2626'}}>5%+</span>
+          </div>
+        </div>
+        <div style={{ fontSize:10, color:'#3f3f46', lineHeight:1.5, padding:'6px 8px', background:'#1c1c1c', borderRadius:8 }}>
+          Rumus: Risiko Rp ÷ (Entry−Stop) ÷ 100 = Lot. <strong style={{color:'#52525b'}}>Bukan saran investasi.</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Root App ─────────────────────────────────────── */
+function App() {
+  const [sym, setSym] = useState('BUMI');
+  const [search, setSearch] = useState('');
+  const [quote, setQuote] = useState(null);
+  const [loadingQ, setLoadingQ] = useState(false);
+  const [tab, setTab] = useState('reversal');
+  const [dataPanelOpen, setDataPanelOpen] = useState(null); // null=both open, true=side only, false=bottom only
+
+  const pick = useCallback(s => {
+    const code = s.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+    if (!code) return;
+    setSym(code); setSearch(''); setQuote(null);
+  }, []);
+
+  useEffect(() => {
+    let dead = false;
+    setLoadingQ(true); setQuote(null);
+    fetchQuote(sym).then(d => { if(!dead){ setQuote(d); setLoadingQ(false); } })
+                   .catch(()=>{ if(!dead) setLoadingQ(false); });
+    return () => { dead=true; };
+  }, [sym]);
+
+  const onKey = e => { if(e.key==='Enter' && search.trim()) pick(search.trim()); };
+
+  return (
+    <div id="root">
+      {/* Header */}
+      <header className="hdr">
+        <div className="hdr-logo">Analisis <span>IDX</span></div>
+        <div className="search-wrap">
+          <span className="s-icon">⌕</span>
+          <input value={search} onChange={e=>setSearch(e.target.value.toUpperCase())}
+            onKeyDown={onKey} placeholder="Kode saham + Enter (mis. BBCA)" />
+        </div>
+        <div className="chips">
+          {STOCKS.map(s=>(
+            <button key={s.sym} className={'chip'+(s.sym===sym?' on':'')}
+              onClick={()=>pick(s.sym)} title={s.nm}>{s.sym}</button>
+          ))}
+        </div>
+        <div className="disc">⚠ Edukasi — bukan saran investasi</div>
+      </header>
+
+      {/* Main */}
+      <main className="main">
+        <div className="chart-col">
+          <TVChart sym={sym} />
+          <button className={'toggle-data-btn'+(dataPanelOpen?' open':'')} 
+            onClick={()=>setDataPanelOpen(!dataPanelOpen)}
+            title={dataPanelOpen?'Sembunyikan data':'Tampilkan data'}
+            aria-label={dataPanelOpen?'Tutup panel data':'Buka panel data'}>
+            {dataPanelOpen?'✕':'≡'}
+          </button>
+        </div>
+        <div className={'data-col'+(dataPanelOpen?' visible':' hidden')}>
+          <DataPanel sym={sym} quote={quote} loading={loadingQ} />
+        </div>
+      </main>
+
+      {/* Bottom tabs — collapsible */}
+      <div className={'bot'+(dataPanelOpen===false?'':' visible')+(dataPanelOpen===false?' hidden':'')}>
+        <div className="tbar">
+          <div className="tbar-tabs">
+            <button className={'tbtn'+(tab==='reversal'?' on':'')} onClick={()=>setTab('reversal')}>
+              Cek Reversal
+            </button>
+            <button className={'tbtn'+(tab==='calc'?' on':'')} onClick={()=>setTab('calc')}>
+              Kalkulator Posisi
+            </button>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:12, paddingRight:12 }}>
+            <span style={{ fontSize:11, color:'#3f3f46', fontFamily:'var(--font-mono)' }}>IDX:{sym} · TradingView Live</span>
+            <a href="Analisis%20Saham.html" style={{ fontSize:11, color:'#52525b', fontWeight:600, textDecoration:'none', borderBottom:'1px solid #3f3f46' }}>
+              ← Deck
+            </a>
+            <button className="toggle-bottom-btn" 
+              onClick={()=>setDataPanelOpen(dataPanelOpen===false?true:false)}
+              title={dataPanelOpen===false?'Tampilkan panel':'Sembunyikan panel'}>
+              {dataPanelOpen===false?'▲':'▼'}
+            </button>
+          </div>
+        </div>
+        <div className="tcontent">
+          {tab==='reversal'
+            ? <ReversalChecker />
+            : <RiskCalc liveEntry={quote?.regularMarketPrice} />
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
